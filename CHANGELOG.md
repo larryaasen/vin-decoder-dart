@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Bumped the minimum Dart version to 3.1.0, removed the use of the meta package, and modernized the code.
+
 ## 0.2.0
 
 - Expose helpers for querying NHTSA DB and accessing extended vehicle information (requested by @ride4sun, issue #8)

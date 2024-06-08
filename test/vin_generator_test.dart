@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 void main() {
   group('VIN Generator Test', () {
     VINGenerator generator;
-    VIN vin;
+    VIN? vin;
 
     setUp(() {
       generator = VINGenerator();
@@ -12,7 +12,7 @@ void main() {
     });
 
     test('Validity Test', () {
-      expect(vin.valid(), isTrue);
+      expect(vin!.valid(), isTrue);
     });
   });
 }

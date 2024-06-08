@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:basic_utils/basic_utils.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 // NHTSA Results not relevant for a specific vehicle can be either null or N/A
 const String _RESULT_NOT_APPLICABLE = 'Not Applicable';
@@ -10,7 +11,7 @@ class NHTSA {
   static const String _uriBase = 'https://vpic.nhtsa.dot.gov/api/vehicles';
 
   /// Obtain information about a given [vin] from the NHTSA DB.
-  static Future<NHTSAVehicleInfo> decodeVin(String vin) async {
+  static Future<NHTSAVehicleInfo?> decodeVin(String vin) async {
     var path = _uriBase + '/DecodeVin/' + vin + '?format=json';
     final response = await http.get(Uri.parse(path));
 
@@ -22,7 +23,7 @@ class NHTSA {
   }
 
   /// Obtain a map of key/value pairs containing known values for a given [vin]
-  static Future<Map<String, dynamic>> decodeVinValues(String vin) async {
+  static Future<Map<String, dynamic>?> decodeVinValues(String vin) async {
     var path = _uriBase + '/DecodeVinValues/' + vin + '?format=json';
     final response = await http.get(Uri.parse(path));
 
@@ -56,15 +57,19 @@ class NHTSAResult {
   /// The ID number of a given [variable]
   int variableId;
 
-  NHTSAResult({this.value, this.valueId, this.variable, this.variableId});
+  NHTSAResult(
+      {required this.value,
+      required this.valueId,
+      required this.variable,
+      required this.variableId});
 
   /// Create a new [NHTSAResult] instance from a fixed JSON payload
-  NHTSAResult.fromJson(Map<String, dynamic> json) {
-    value = json['Value'];
-    valueId = json['ValueId'];
-    variable = json['Variable'];
-    variableId = json['VariableId'];
-  }
+  factory NHTSAResult.fromJson(Map<String, dynamic> json) => NHTSAResult(
+        value: json['Value'] ?? '',
+        valueId: json['ValueId'],
+        variable: json['Variable'],
+        variableId: json['VariableId'],
+      );
 
   @override
   String toString() {
@@ -80,13 +85,14 @@ class NHTSAVehicleInfo {
   List<NHTSAResult> results = [];
 
   NHTSAVehicleInfo(
-      {this.count, this.message, this.searchCriteria, this.results});
+      {required this.count,
+      required this.message,
+      required this.searchCriteria,
+      required this.results});
 
   /// Create a new [NHTSAVehicleInfo] instance from a fixed JSON payload
-  NHTSAVehicleInfo.fromJson(Map<String, dynamic> json) {
-    count = json['Count'];
-    message = json['Message'];
-    searchCriteria = json['SearchCriteria'];
+  factory NHTSAVehicleInfo.fromJson(Map<String, dynamic> json) {
+    final results = <NHTSAResult>[];
     if (json['Results'] != null) {
       json['Results'].forEach((v) {
         if (v['Value'] != null &&
@@ -96,6 +102,13 @@ class NHTSAVehicleInfo {
         }
       });
     }
+
+    return NHTSAVehicleInfo(
+      count: json['Count'],
+      message: json['Message'],
+      searchCriteria: json['SearchCriteria'],
+      results: results,
+    );
   }
 
   static String _normalizeStringValue(String s) {
@@ -104,17 +117,16 @@ class NHTSAVehicleInfo {
   }
 
   /// Lookup the value of a variable by its [variableId] in the NHTSA DB results
-  String valueFromId(int variableId) {
-    var result = results.singleWhere((e) => e.variableId == variableId,
-        orElse: () => null);
-    return result != null ? _normalizeStringValue(result.value) : null;
+  String? valueFromId(int variableId) {
+    final index =
+        results.indexWhere((element) => element.variableId == variableId);
+    return index == -1 ? null : _normalizeStringValue(results[index].value);
   }
 
   /// Lookup the value of a named [variable] in the NHTSA DB results
-  String value(String variable) {
-    var result =
-        results.singleWhere((e) => e.variable == variable, orElse: () => null);
-    return result != null ? _normalizeStringValue(result.value) : null;
+  String? value(String variable) {
+    final index = results.indexWhere((element) => element.variable == variable);
+    return index == -1 ? null : _normalizeStringValue(results[index].value);
   }
 
   @override

@@ -15,3 +15,4 @@ build/
 
 # Directory created by dartdoc
 doc/api/
+.DS_Store

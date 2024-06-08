@@ -2,8 +2,6 @@ import 'manufacturers.dart';
 import 'nhtsa_model.dart';
 import 'year_map.dart';
 
-import 'package:meta/meta.dart';
-
 class VIN {
   /// The VIN that the class was instantiated with.
   final String number;
@@ -21,14 +19,14 @@ class VIN {
   final bool extended;
   Map<String, dynamic> _vehicleInfo = {};
 
-  VIN({@required this.number, this.extended = false})
+  VIN({required this.number, this.extended = false})
       : wmi = normalize(number).substring(0, 3),
         vds = normalize(number).substring(3, 9),
         vis = normalize(number).substring(9, 17);
 
   /// Carry out VIN validation. A valid [number] must be 17 characters long
   /// and contain only valid alphanumeric characters.
-  bool valid([String number]) {
+  bool valid([String? number]) {
     String value = normalize(number != null ? number : this.number);
     return RegExp(r"^[a-zA-Z0-9]+$").hasMatch(value) && value.length == 17;
   }
@@ -39,7 +37,7 @@ class VIN {
 
   /// Obtain the encoded manufacturing year in YYYY format.
   int getYear() {
-    return yearMap[modelYear()];
+    return yearMap[modelYear()] ?? 0;
   }
 
   /// Obtain the 2-character region code for the manufacturing region.
@@ -69,13 +67,13 @@ class VIN {
   String getManufacturer() {
     // Check for the standard case - a 3 character WMI
     if (manufacturers.containsKey(this.wmi)) {
-      return manufacturers[this.wmi];
+      return manufacturers[this.wmi] ?? '';
     } else {
       // Some manufacturers only use the first 2 characters for manufacturer
       // identification, and the third for the class of vehicle.
       var id = this.wmi.substring(0, 2);
       if (manufacturers.containsKey(id)) {
-        return manufacturers[id];
+        return manufacturers[id] ?? '';
       } else {
         return "Unknown (WMI: ${this.wmi.toUpperCase()})";
       }
@@ -85,7 +83,7 @@ class VIN {
   /// Returns the checksum for the VIN. Note that in the case of the EU region
   /// checksums are not implemented, so this becomes a no-op. More information
   /// is provided in ISO 3779:2009.
-  String getChecksum() {
+  String? getChecksum() {
     return (getRegion() != "EU") ? normalize(this.number)[8] : null;
   }
 
@@ -100,7 +98,7 @@ class VIN {
 
   Future<void> _fetchExtendedVehicleInfo() async {
     if (this._vehicleInfo.isEmpty && extended == true) {
-      this._vehicleInfo = await NHTSA.decodeVinValues(this.number);
+      this._vehicleInfo = await NHTSA.decodeVinValues(this.number) ?? {};
     }
   }
 
