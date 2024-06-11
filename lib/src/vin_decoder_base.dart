@@ -1,5 +1,6 @@
 import 'manufacturers.dart';
 import 'nhtsa_model.dart';
+import 'nhtsa_vehicle.dart';
 import 'year_map.dart';
 
 class VIN {
@@ -27,7 +28,11 @@ class VIN {
   /// Carry out VIN validation. A valid [number] must be 17 characters long
   /// and contain only valid alphanumeric characters.
   bool valid([String? number]) {
-    String value = normalize(number != null ? number : this.number);
+    return isValid(number != null ? number : this.number);
+  }
+
+  static bool isValid(String number) {
+    String value = normalize(number);
     return RegExp(r"^[a-zA-Z0-9]+$").hasMatch(value) && value.length == 17;
   }
 
@@ -95,6 +100,14 @@ class VIN {
 
   /// Extract the serial number from the [number].
   String serialNumber() => normalize(this.number).substring(12, 17);
+
+  /// Fetch the NHTSA vehicle information for a VIN [number].
+  static Future<NHTSAVehicle?> fetchVehicleInfo(String number) async {
+    if (!isValid(number)) return null;
+    final vehicleInfo = await NHTSA.decodeVinValues(number);
+    final vehicle = NHTSAVehicle.fromMap(vehicleInfo);
+    return vehicle;
+  }
 
   Future<void> _fetchExtendedVehicleInfo() async {
     if (this._vehicleInfo.isEmpty && extended == true) {

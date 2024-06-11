@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:http/http.dart' as http;
 
-// NHTSA Results not relevant for a specific vehicle can be either null or N/A
-const String _RESULT_NOT_APPLICABLE = 'Not Applicable';
-
 /// A wrapper for the NHTSA REST API
+/// Ex: https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/WP0ZZZ99ZTS392124?format=json
+/// Docs: https://vpic.nhtsa.dot.gov/api/
 class NHTSA {
   static const String _uriBase = 'https://vpic.nhtsa.dot.gov/api/vehicles';
+
+  /// NHTSA Results not relevant for a specific vehicle can be either null or N/A
+  static const String _RESULT_NOT_APPLICABLE = 'Not Applicable';
 
   /// Obtain information about a given [vin] from the NHTSA DB.
   static Future<NHTSAVehicleInfo?> decodeVin(String vin) async {
@@ -96,7 +98,7 @@ class NHTSAVehicleInfo {
     if (json['Results'] != null) {
       json['Results'].forEach((v) {
         if (v['Value'] != null &&
-            v['Value'] != _RESULT_NOT_APPLICABLE &&
+            v['Value'] != NHTSA._RESULT_NOT_APPLICABLE &&
             v['Value'] != '') {
           results.add(NHTSAResult.fromJson(v));
         }

@@ -1,3 +1,7 @@
+## Next
+
+- Added NHTSA vehicle model and new fetch NHTSA vehicle details method. Also improved validation method.
+
 ## 2.0.0
 
 - Bumped the minimum Dart version to 3.1.0, removed the use of the meta package, and modernized the code.
