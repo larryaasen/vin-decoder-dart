@@ -14,7 +14,7 @@ class NHTSA {
 
   /// Obtain information about a given [vin] from the NHTSA DB.
   static Future<NHTSAVehicleInfo?> decodeVin(String vin) async {
-    var path = _uriBase + '/DecodeVin/' + vin + '?format=json';
+    var path = '$_uriBase/DecodeVin/$vin?format=json';
     final response = await http.get(Uri.parse(path));
 
     if (response.statusCode == 200) {
@@ -26,7 +26,7 @@ class NHTSA {
 
   /// Obtain a map of key/value pairs containing known values for a given [vin]
   static Future<Map<String, dynamic>?> decodeVinValues(String vin) async {
-    var path = _uriBase + '/DecodeVinValues/' + vin + '?format=json';
+    var path = '$_uriBase/DecodeVinValues/$vin?format=json';
     final response = await http.get(Uri.parse(path));
 
     // The DecodeVinValues endpoint returns a single Results object with all

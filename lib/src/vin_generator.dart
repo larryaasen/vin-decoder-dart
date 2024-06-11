@@ -7,7 +7,7 @@ import 'year_map.dart';
 const _vinChars = "ABCDEFGHJKLMNPRSTUVWXYZ0123456789";
 
 class VINGenerator {
-  var _random = Random();
+  final _random = Random();
 
   /// Generate a random (valid) WMI
   String generateWmi() {
@@ -27,9 +27,7 @@ class VINGenerator {
   /// default assembly plant definition (A) and a random production sequence
   /// number.
   String generateVis() {
-    return yearMap.keys.elementAt(_random.nextInt(yearMap.length)) +
-        'A' +
-        randomNumeric(6).toString();
+    return '${yearMap.keys.elementAt(_random.nextInt(yearMap.length))}A${randomNumeric(6)}';
   }
 
   String generateVds() {

@@ -8,23 +8,23 @@ void main() async {
   print('VDS: ${vin.vds}');
   print('VIS: ${vin.vis}');
 
-  print("Model year is " + vin.modelYear());
-  print("Serial number is " + vin.serialNumber());
-  print("Assembly plant is " + vin.assemblyPlant());
-  print("Manufacturer is " + vin.getManufacturer());
-  print("Year is " + vin.getYear().toString());
-  print("Region is " + vin.getRegion());
-  print("VIN string is " + vin.toString());
+  print("Model year is ${vin.modelYear()}");
+  print("Serial number is ${vin.serialNumber()}");
+  print("Assembly plant is ${vin.assemblyPlant()}");
+  print("Manufacturer is ${vin.getManufacturer()}");
+  print("Year is ${vin.getYear()}");
+  print("Region is ${vin.getRegion()}");
+  print("VIN string is $vin");
 
   // The following calls are to the NHTSA DB, and are carried out asynchronously
   var make = await vin.getMakeAsync();
-  print("Make is ${make}");
+  print("Make is $make");
 
   var model = await vin.getModelAsync();
-  print("Model is ${model}");
+  print("Model is $model");
 
   var type = await vin.getVehicleTypeAsync();
-  print("Type is ${type}");
+  print("Type is $type");
 
   var info = await NHTSA.decodeVin(vin.number);
   print('Plant Country is ${info?.value('Plant Country')}');
@@ -33,5 +33,5 @@ void main() async {
   print('Manufacturer from NHTSA DB is ${values?['Manufacturer']}');
 
   var generated = VINGenerator().generate();
-  print('Randomly Generated VIN is ${generated}');
+  print('Randomly Generated VIN is $generated');
 }

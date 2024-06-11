@@ -28,7 +28,7 @@ class VIN {
   /// Carry out VIN validation. A valid [number] must be 17 characters long
   /// and contain only valid alphanumeric characters.
   bool valid([String? number]) {
-    return isValid(number != null ? number : this.number);
+    return isValid(number ?? this.number);
   }
 
   static bool isValid(String number) {
@@ -47,22 +47,22 @@ class VIN {
 
   /// Obtain the 2-character region code for the manufacturing region.
   String getRegion() {
-    if (RegExp(r"[A-H]", caseSensitive: false).hasMatch(this.number[0])) {
+    if (RegExp(r"[A-H]", caseSensitive: false).hasMatch(number[0])) {
       return "AF";
     }
-    if (RegExp(r"[J-R]", caseSensitive: false).hasMatch(this.number[0])) {
+    if (RegExp(r"[J-R]", caseSensitive: false).hasMatch(number[0])) {
       return "AS";
     }
-    if (RegExp(r"[S-Z]", caseSensitive: false).hasMatch(this.number[0])) {
+    if (RegExp(r"[S-Z]", caseSensitive: false).hasMatch(number[0])) {
       return "EU";
     }
-    if (RegExp(r"[1-5]", caseSensitive: false).hasMatch(this.number[0])) {
+    if (RegExp(r"[1-5]", caseSensitive: false).hasMatch(number[0])) {
       return "NA";
     }
-    if (RegExp(r"[6-7]", caseSensitive: false).hasMatch(this.number[0])) {
+    if (RegExp(r"[6-7]", caseSensitive: false).hasMatch(number[0])) {
       return "OC";
     }
-    if (RegExp(r"[8-9]", caseSensitive: false).hasMatch(this.number[0])) {
+    if (RegExp(r"[8-9]", caseSensitive: false).hasMatch(number[0])) {
       return "SA";
     }
     return "Unknown";
@@ -71,16 +71,16 @@ class VIN {
   /// Get the full name of the vehicle manufacturer as defined by the [wmi].
   String getManufacturer() {
     // Check for the standard case - a 3 character WMI
-    if (manufacturers.containsKey(this.wmi)) {
-      return manufacturers[this.wmi] ?? '';
+    if (manufacturers.containsKey(wmi)) {
+      return manufacturers[wmi] ?? '';
     } else {
       // Some manufacturers only use the first 2 characters for manufacturer
       // identification, and the third for the class of vehicle.
-      var id = this.wmi.substring(0, 2);
+      var id = wmi.substring(0, 2);
       if (manufacturers.containsKey(id)) {
         return manufacturers[id] ?? '';
       } else {
-        return "Unknown (WMI: ${this.wmi.toUpperCase()})";
+        return "Unknown (WMI: ${wmi.toUpperCase()})";
       }
     }
   }
@@ -89,17 +89,17 @@ class VIN {
   /// checksums are not implemented, so this becomes a no-op. More information
   /// is provided in ISO 3779:2009.
   String? getChecksum() {
-    return (getRegion() != "EU") ? normalize(this.number)[8] : null;
+    return (getRegion() != "EU") ? normalize(number)[8] : null;
   }
 
   /// Extract the single-character model year from the [number].
-  String modelYear() => normalize(this.number)[9];
+  String modelYear() => normalize(number)[9];
 
   /// Extract the single-character assembly plant designator from the [number].
-  String assemblyPlant() => normalize(this.number)[10];
+  String assemblyPlant() => normalize(number)[10];
 
   /// Extract the serial number from the [number].
-  String serialNumber() => normalize(this.number).substring(12, 17);
+  String serialNumber() => normalize(number).substring(12, 17);
 
   /// Fetch the NHTSA vehicle information for a VIN [number].
   static Future<NHTSAVehicle?> fetchVehicleInfo(String number) async {
@@ -110,8 +110,8 @@ class VIN {
   }
 
   Future<void> _fetchExtendedVehicleInfo() async {
-    if (this._vehicleInfo.isEmpty && extended == true) {
-      this._vehicleInfo = await NHTSA.decodeVinValues(this.number) ?? {};
+    if (_vehicleInfo.isEmpty && extended == true) {
+      _vehicleInfo = await NHTSA.decodeVinValues(number) ?? {};
     }
   }
 
@@ -119,23 +119,23 @@ class VIN {
   /// is enabled.
   Future<String> getMakeAsync() async {
     await _fetchExtendedVehicleInfo();
-    return this._vehicleInfo['Make'];
+    return _vehicleInfo['Make'];
   }
 
   /// Get the Model of the vehicle from the NHTSA database if [extended] mode
   /// is enabled.
   Future<String> getModelAsync() async {
     await _fetchExtendedVehicleInfo();
-    return this._vehicleInfo['Model'];
+    return _vehicleInfo['Model'];
   }
 
   /// Get the Vehicle Type from the NHTSA database if [extended] mode is
   /// enabled.
   Future<String> getVehicleTypeAsync() async {
     await _fetchExtendedVehicleInfo();
-    return this._vehicleInfo['VehicleType'];
+    return _vehicleInfo['VehicleType'];
   }
 
   @override
-  String toString() => this.wmi + this.vds + this.vis;
+  String toString() => wmi + vds + vis;
 }
