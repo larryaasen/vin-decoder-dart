@@ -2,12 +2,12 @@
 class NHTSAVehicle {
   /// Creates a vehicle object with data from the NHTSA.
   const NHTSAVehicle(
-      {this.make, this.model, this.year, this.VIN, this.vehicleType});
+      {this.make, this.model, this.year, this.vin, this.vehicleType});
 
   final String? make;
   final String? model;
   final String? year;
-  final String? VIN;
+  final String? vin;
   final String? vehicleType;
 
   static NHTSAVehicle? fromMap(Map<String, dynamic>? map) {
@@ -20,7 +20,7 @@ class NHTSAVehicle {
         make: make,
         model: model,
         year: map?['ModelYear'] as String?,
-        VIN: map?['VIN'] as String?,
+        vin: map?['VIN'] as String?,
         vehicleType: map?['VehicleType'] as String?,
       );
     }

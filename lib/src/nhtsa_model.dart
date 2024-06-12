@@ -10,7 +10,7 @@ class NHTSA {
   static const String _uriBase = 'https://vpic.nhtsa.dot.gov/api/vehicles';
 
   /// NHTSA Results not relevant for a specific vehicle can be either null or N/A
-  static const String _RESULT_NOT_APPLICABLE = 'Not Applicable';
+  static const String resultNotApplicable = 'Not Applicable';
 
   /// Obtain information about a given [vin] from the NHTSA DB.
   static Future<NHTSAVehicleInfo?> decodeVin(String vin) async {
@@ -37,7 +37,7 @@ class NHTSA {
       Map<String, dynamic> map = data['Results'][0];
       // Discard empty and not applicable entries from map
       map.removeWhere((key, value) =>
-          value == null || value == _RESULT_NOT_APPLICABLE || value == '');
+          value == null || value == resultNotApplicable || value == '');
       return map;
     }
 
@@ -98,7 +98,7 @@ class NHTSAVehicleInfo {
     if (json['Results'] != null) {
       json['Results'].forEach((v) {
         if (v['Value'] != null &&
-            v['Value'] != NHTSA._RESULT_NOT_APPLICABLE &&
+            v['Value'] != NHTSA.resultNotApplicable &&
             v['Value'] != '') {
           results.add(NHTSAResult.fromJson(v));
         }
