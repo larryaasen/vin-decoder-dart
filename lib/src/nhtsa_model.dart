@@ -43,6 +43,38 @@ class NHTSA {
 
     return null;
   }
+
+  /// Returns a list of all makes from the NHTSA DB.
+  /// https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json
+  static Future<List<String>?> getAllMakes() async {
+    var path = '$_uriBase/getallmakes?format=json';
+    final response = await http.get(Uri.parse(path));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      final results = data['Results'];
+      final makes = <String>[];
+      if (results is List) {
+        for (final element in results) {
+          final make = element['Make_Name'] as String?;
+          if (make != null && make.isNotEmpty) {
+            makes.add(make);
+          }
+        }
+      }
+      return makes;
+    }
+
+    return null;
+  }
+
+  List<String>? _makes;
+
+  Future<bool> isMakeValid(String make) async {
+    _makes ??= await getAllMakes();
+    final valid = _makes?.contains(make.toUpperCase()) ?? false;
+    return valid;
+  }
 }
 
 /// The result of a single data point from the NHTSA DB for a specific variable.
