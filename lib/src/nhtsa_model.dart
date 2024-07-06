@@ -75,6 +75,30 @@ class NHTSA {
     final valid = _makes?.contains(make.toUpperCase()) ?? false;
     return valid;
   }
+
+  /// Returns a list of all models for a make from the NHTSA DB.
+  /// https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/honda?format=json
+  static Future<List<String>?> getModelsForMake(String make) async {
+    var path = '$_uriBase/getmodelsformake/$make?format=json';
+    final response = await http.get(Uri.parse(path));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      final results = data['Results'];
+      final models = <String>[];
+      if (results is List) {
+        for (final element in results) {
+          final model = element['Model_Name'] as String?;
+          if (model != null && model.isNotEmpty) {
+            models.add(model.toUpperCase());
+          }
+        }
+      }
+      return models;
+    }
+
+    return null;
+  }
 }
 
 /// The result of a single data point from the NHTSA DB for a specific variable.

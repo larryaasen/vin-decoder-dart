@@ -2,10 +2,18 @@
 class NHTSAVehicle {
   /// Creates a vehicle object with data from the NHTSA.
   const NHTSAVehicle(
-      {this.make, this.model, this.year, this.vin, this.vehicleType});
+      {this.make,
+      this.model,
+      this.series,
+      this.trim,
+      this.year,
+      this.vin,
+      this.vehicleType});
 
   final String? make;
   final String? model;
+  final String? series;
+  final String? trim;
   final String? year;
   final String? vin;
   final String? vehicleType;
@@ -19,6 +27,8 @@ class NHTSAVehicle {
       vehicle = NHTSAVehicle(
         make: make,
         model: model,
+        series: map?['Series'] as String?,
+        trim: map?['Trim'] as String?,
         year: map?['ModelYear'] as String?,
         vin: map?['VIN'] as String?,
         vehicleType: map?['VehicleType'] as String?,
